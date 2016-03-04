@@ -8,7 +8,12 @@ class CustomStreamListener(tweepy.StreamListener):
 
     def __init__(self):
     	super(CustomStreamListener, self).__init__()
-        self.counter = 0
+    	tweet_list = os.listdir(settings["file_path"])
+    	tweet_list = [ int(x[5:-4]) for x in tweet_list ]
+    	if tweet_list:
+    		self.counter = max(tweet_list)
+    	else:
+        	self.counter = 0
 
     def on_status(self, status):
     	fname = '/tweet' + str(self.counter) + '.txt'
