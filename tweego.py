@@ -67,8 +67,12 @@ class Tweego(object):
 
 
 def main():
-	tw = Tweego()
-	tw.findTweetsIn()
+	while True:
+		try:
+			tw = Tweego()
+			tw.findTweetsIn()
+		except socket.error, e:
+			print "Connection Problem"
 
 
 
