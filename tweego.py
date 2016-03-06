@@ -5,6 +5,7 @@ import tweepy
 from settings import settings
 
 
+
 class CustomStreamListener(tweepy.StreamListener):
 
     def __init__(self):
@@ -72,14 +73,14 @@ def main():
         try:
             tw = Tweego()
             tw.findTweetsIn()
-        except IncompleteRead:
-            ## Connection broken
-            print "Connection broken"
-            continue
         except KeyboardInterrupt:
             ## ctrl + c presset
             print "Stream disconected, Leaving..."
             break
+        except Exception:
+            ## Connection broken
+            print "Connection broken"
+            continue
 
 
 
