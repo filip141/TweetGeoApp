@@ -1,30 +1,25 @@
 import os
+import sys
 import json
 import unicodedata
 from settings import settings
+from database import MongoBase
 
 class TweetFilter(object):
 
-    __TWEETPREF = "./Tweets/tweet"
-    __TWEETSUFF = ".txt"
     aval_types = [ "user", "tweet"]
-
 
     ## Clas constructor
     def __init__(self):
-        tweet_list = os.listdir(settings["file_path"])
-        tweet_list = [ int(x[5:-4]) for x in tweet_list ]
-        if tweet_list:
-            self.tweet_num = max(tweet_list)
-        else:
-            self.tweet_num = 0
+        try:
+            self.db = MongoBase(settings['db_addr'])
+            self.data_cursor = self.db.get_dataset("user_tweets")
+        except Exception:
+            print "Problem with databse occured when trying get access to data..."
+            sys.exit(1)
 
-
-    ## Filter method, maches records in tweets json files and returns
-    ## list of tweets found and number of mached records
-    ## Method need to specify type of required information, it could be "user" account
-    ## information or single tweet info 
-    def filter(self, atr="location", info_type="tweet", validate=True):
+    ## Filter method, maches records in tweets jsons
+    def filter(self, atr="location", info_type="tweet", validate=True, save=True):
 
         # Throw value exception if type is not valid
         if not info_type in self.aval_types:
@@ -32,20 +27,30 @@ class TweetFilter(object):
 
         num_mat = 0
         # iterate over tweets
-        for number in range(0, self.tweet_num):
-            with open(self.__TWEETPREF + str(number) + self.__TWEETSUFF) as json_file:
-                json_data = json.load(json_file)
+        for tweet in self.data_cursor:
+                # Check information type
                 if info_type == self.aval_types[0]:
-                    json_data = json_data["user"]
-                if json_data.get(atr):
-                    value = str(unicodedata.normalize('NFD', json_data[atr]).encode('ascii', 'ignore'))
+                    res_data = tweet["user"]
+                else:
+                    res_data = tweet
+                if res_data.get(atr):
+                    # Remove polish characters if string is unicode
+                    if isinstance(res_data[atr], unicode):
+                        value = unicodedata.normalize('NFD', res_data[atr]).encode('ascii', 'ignore')
+                    else:
+                        value = str(res_data[atr])
+                    # Increment match counter
+                    num_mat = num_mat + 1
                     # If validation set as True
                     if validate and atr == "location" :
-                        if not self.validate_location(value):
+                        city = self.validate_location(value)
+                        if not city:
                             continue
-                    num_mat = num_mat + 1
+                        else:
+                            tweet["user"]["location"] = city
+                    if save:
+                        self.db.insert_Tweet(tweet, atr)
                     print "matches: " + str(num_mat) + " value: " + value
-                    
         return num_mat
 
     ## Method to verify location status
@@ -58,18 +63,29 @@ class TweetFilter(object):
         return None
 
 
+    def gen_statfile(self, match_num, atr, sfile="statfile.dat"):
+        stats = {}
+        json_data = {}
+        with open(settings["abs_path"] + "/" + sfile, 'a+') as stat_file:
+            stats["matches"] = match_num
+            stats["percent"] = str((100*match_num*1.0)/self.db.tweet_num) + "%"
+            stats["path"] = "/" + atr
+            json_data[atr] = stats
+            json.dump(json_data, stat_file)
 
-
-
-
+    def rm_statfile(self, sfile="statfile.dat"):
+        try:
+            os.remove('./' + sfile)
+        except:
+            pass
 
 def main():
     tw = TweetFilter()
-    print tw.filter(info_type="user")
-    # print tw.filter(atr="geo")
-    # print tw.validate_location("wroclaw")
-
-
+    tw.rm_statfile()
+    user = tw.filter(info_type="user")
+    geo = tw.filter(atr="geo")
+    tw.gen_statfile(user, "user")
+    tw.gen_statfile(geo, "geo")
 
 
 
