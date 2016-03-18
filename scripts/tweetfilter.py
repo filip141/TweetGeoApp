@@ -1,9 +1,10 @@
 import os
-import sys
 import json
+import sys
 import unicodedata
-from settings import settings
 from database import MongoBase
+from settings import settings
+
 
 class TweetFilter(object):
 
@@ -49,7 +50,7 @@ class TweetFilter(object):
                         else:
                             tweet["user"]["location"] = city
                     if save:
-                        self.db.insert_Tweet(tweet, atr)
+                        self.db.insert_in_col(tweet, atr)
                     print "matches: " + str(num_mat) + " value: " + value
         return num_mat
 
@@ -63,17 +64,17 @@ class TweetFilter(object):
         return None
 
 
-    def gen_statfile(self, match_num, atr, sfile="statfile.dat"):
+    def gen_statfile(self, match_num, atr, sfile=settings["statfile_name"]):
         stats = {}
         json_data = {}
-        with open(settings["abs_path"] + "/" + sfile, 'a+') as stat_file:
+        with open(sfile, 'a+') as stat_file:
             stats["matches"] = match_num
             stats["percent"] = str((100*match_num*1.0)/self.db.tweet_num) + "%"
             stats["path"] = "/" + atr
             json_data[atr] = stats
             json.dump(json_data, stat_file)
 
-    def rm_statfile(self, sfile="statfile.dat"):
+    def rm_statfile(self, sfile=settings["statfile_name"]):
         try:
             os.remove('./' + sfile)
         except:

@@ -12,7 +12,7 @@ class DataBase(object):
         pass
 
     @abstractmethod
-    def insert_Tweet(self, tweet_json, col):
+    def insert_in_col(self, tweet_json, col):
         pass
 
     @abstractmethod
@@ -39,12 +39,10 @@ class MongoBase(DataBase):
         self.db.user_tweets.insert(tweet_json)
 
     ## Insert tweet in specified collection
-    def insert_Tweet(self, tweet_json, col):
+    def insert_in_col(self, tweet_json, col):
         dbcol = self.db[col]
         if not dbcol.find_one(tweet_json):
             dbcol.insert(tweet_json)
-
-
 
     ## Get cursor to specific data
     def get_dataset(self, col, find_arg=""):

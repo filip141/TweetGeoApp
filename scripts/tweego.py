@@ -1,14 +1,20 @@
 import sys
+
 import tweepy
-from settings import settings
 from database import MongoBase
+from settings import settings
+
 
 class CustomStreamListener(tweepy.StreamListener):
 
     def __init__(self):
         super(CustomStreamListener, self).__init__()
         # Initialize mongo object
-        self.db = MongoBase(settings['db_addr'])
+        try:
+            self.db = MongoBase(settings['db_addr'])
+        except Exception:
+            print "Problem with database"
+            raise
 
     def on_status(self, status):
         print status.text
@@ -34,7 +40,6 @@ class Tweego(object):
 
         ## API init
         self.api = tweepy.API(self.auth)
-
 
 
     ## Method helps to find tweets
