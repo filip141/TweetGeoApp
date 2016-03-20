@@ -1,17 +1,15 @@
 import sys
-
 import tweepy
 from database import MongoBase
 from settings import settings
 
-
 class CustomStreamListener(tweepy.StreamListener):
 
-    def __init__(self):
+    def __init__(self, db_addr='localhost:27017'):
         super(CustomStreamListener, self).__init__()
         # Initialize mongo object
         try:
-            self.db = MongoBase(settings['db_addr'])
+            self.db = MongoBase(db_addr)
         except Exception:
             print "Problem with database"
             raise
@@ -28,7 +26,6 @@ class CustomStreamListener(tweepy.StreamListener):
         print >> sys.stderr, 'Timeout...'
         return True # Don't kill the stream
 
-
 class Tweego(object):
 
     ## Tweego construcotr
@@ -41,13 +38,11 @@ class Tweego(object):
         ## API init
         self.api = tweepy.API(self.auth)
 
-
     ## Method helps to find tweets
     ## from specified localization
     def findTweetsIn(self):
-        sapi = tweepy.streaming.Stream(self.auth, CustomStreamListener())
+        sapi = tweepy.streaming.Stream(self.auth, CustomStreamListener(db_addr=settings['db_addr']))
         sapi.filter(languages=["pl"], track=self.read_lang()[settings["START"]:settings["END"]])
-
 
     ## Read file with common polish words
     def read_lang(self, fname=settings['langfile_name']):
@@ -55,7 +50,6 @@ class Tweego(object):
             lang_list = lang_file.read().split(",")
             lang_list = [ x.replace(" ", "") for x in lang_list ]
             return lang_list
-
 
 def main():
     while True:
