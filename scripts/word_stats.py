@@ -93,7 +93,8 @@ class CityStats(object):
         self.mn_db = MongoBase(db_addr)
         self.word_stats = WordStats(punfile=punfile, stopfile=stopfile)
 
-    def get_string_list( self, basename, city ):
+    ## get tweets from specified city
+    def get_json_list( self, basename, city ):
         db_cur = self.mn_db.get_dataset( basename, find_arg={"user.location": city} )
         return db_cur
 
@@ -111,7 +112,7 @@ class CityStats(object):
         words_found = []
         cities = self.get_cities_list(city_path)
         for city in  cities:
-            db_cur = self.get_string_list('location', city)
+            db_cur = self.get_json_list('location', city)
             res = self.word_stats.word_counter(db_cur)
             res = { key: value for (key, value) in res.iteritems() if value > 1 }
             words_found.append(res)
