@@ -107,14 +107,18 @@ class CityStats(object):
                 cities.append(line[:-1])
         return cities
 
+    def get_word_freq(self, city):
+        db_cur = self.get_json_list('location', city)
+        res = self.word_stats.word_counter(db_cur)
+        res = { key: value for (key, value) in res.iteritems() if value > 1 }
+        return res
+
     ## Count tweet words for specified location
     def count_citywords(self, city_path="cities.txt"):
         words_found = []
         cities = self.get_cities_list(city_path)
         for city in  cities:
-            db_cur = self.get_json_list('location', city)
-            res = self.word_stats.word_counter(db_cur)
-            res = { key: value for (key, value) in res.iteritems() if value > 1 }
+            res = self.get_word_freq(city)
             words_found.append(res)
             print "\n\nCity: " + city + ", result: \n"
             print res
