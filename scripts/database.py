@@ -45,7 +45,7 @@ class MongoBase(DataBase):
             dbcol.insert(tweet_json)
 
     ## Get cursor to specific data
-    def get_dataset(self, col, find_arg=""):
+    def get_dataset(self, col, find_arg={}):
         # Check collection existence
         if col in self.db.collection_names():
             dbcol = self.db[col]
