@@ -56,10 +56,9 @@ class TweetFilter(object):
 
     ## Method to verify location status
     def validate_location(self, pcity):
-        pcity = pcity.lower()
         with open(settings["cities_path"], 'r') as citi_file:
             for line in citi_file:
-                if line[:-1].lower() in pcity:
+                if line[:-1] in pcity:
                     return line[:-1]
         return None
 
@@ -76,7 +75,7 @@ class TweetFilter(object):
 
     def rm_statfile(self, sfile=settings["statfile_name"]):
         try:
-            os.remove('./' + sfile)
+            os.remove(settings["statfile_name"])
         except:
             pass
 

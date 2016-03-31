@@ -113,7 +113,7 @@ Czerwionka-Leszczyny
 Czestochowa
 Czlopa
 Czluchow
-cmielow
+Cmielow
 Darlowo
 Dabie
 Dabrowa Bialostocka
@@ -176,7 +176,7 @@ Golancz
 Goldap
 Goniadz
 Gorlice
-Gorzow slaski
+Gorzow Slaski
 Gorzow Wielkopolski
 Gostynin
 Gostyn
@@ -195,7 +195,7 @@ Grudziadz
 Grybow
 Gryfice
 Gryfino
-Gryfow slaski
+Gryfow Slaski
 Gubin
 Hajnowka
 Hel
@@ -221,7 +221,7 @@ Jastrowie
 Jastrzebie Zdroj
 Jawor
 Jaworzno
-Jaworzyna slaska
+Jaworzyna Slaska
 Jedlicze
 Jedlina Zdroj
 Jedwabne
@@ -282,7 +282,7 @@ Kolobrzeg
 Koniecpol
 Konin
 Konstancin-Jeziorna
-Konstantynow lodzki
+Konstantynow Lodzki
 Konskie
 Korfantow
 Koronowo
@@ -359,28 +359,28 @@ Lubon
 Lubraniec
 Lubsko
 Lwowek
-Lwowek slaski
-labiszyn
-lancut
-lapy
-lasin
-lask
-laskarzew
-laziska Gorne
-lazy
-leba
-leczna
-leczyca
-leknica
-lobez
-lobzenica
-lochow
-lomianki
-lomza
-losice
-lowicz
-lodz
-lukow
+Lwowek Slaski
+Labiszyn
+Lancut
+Lapy
+Lasin
+Lask
+Laskarzew
+Laziska Gorne
+Lazy
+Leba
+Leczna
+Leczyca
+Leknica
+Lobez
+Lobzenica
+Lochow
+Lomianki
+Lomza
+Losice
+Lowicz
+Lodz
+Lukow
 Makow Mazowiecki
 Makow Podhalanski
 Malbork
@@ -389,7 +389,7 @@ Malomice
 Margonin
 Marki
 Maszewo
-Miasteczko slaskie
+Miasteczko Slaskie
 Miastko
 Miechow
 Miejska Gorka
@@ -468,7 +468,7 @@ Nowy Tomysl
 Nowy Wisnicz
 Nysa
 Oborniki
-Oborniki slaskie
+Oborniki Slaskie
 Obrzycko
 Odolanow
 Ogrodzieniec
@@ -493,7 +493,7 @@ Osieczna
 Osiek
 Ostroleka
 Ostrorog
-Ostrowiec swietokrzyski
+Ostrowiec Swietokrzyski
 Ostroda
 Ostrow Lubelski
 Ostrow Mazowiecka
@@ -520,7 +520,7 @@ Piaseczno
 Piaski
 Piastow
 Piechowice
-Piekary slaskie
+Piekary Slaskie
 Pieniezno
 Piensk
 Pieszyce
@@ -606,7 +606,7 @@ Rogozno
 Ropczyce
 Rozan
 Ruciane-Nida
-Ruda slaska
+Ruda Slaska
 Rudnik nad Sanem
 Rumia
 Rybnik
@@ -630,7 +630,7 @@ Sepolno Krajenskie
 Sianow
 Siechnice
 Siedlce
-Siemianowice slaskie
+Siemianowice Slaskie
 Siemiatycze
 Sieniawa
 Sieradz
@@ -676,8 +676,8 @@ Stawiski
 Stawiszyn
 Staporkow
 Steszew
-Stoczek lukowski
-Stronie slaskie
+Stoczek Lukowski
+Stronie Slaskie
 Strumien
 Strykow
 Strzegom
@@ -721,23 +721,23 @@ Szprotawa
 Sztum
 Szubin
 Szydlowiec
-scinawa
-slesin
-smigiel
-srem
-sroda slaska
-sroda Wielkopolska
-swiatniki Gorne
-swidnica
-swidnik
-swidwin
-swiebodzice
-swiebodzin
-swiecie
-swieradow Zdroj
-swierzawa
-swietochlowice
-swinoujscie
+Scinawa
+Slesin
+Smigiel
+Srem
+Sroda Slaska
+Sroda Wielkopolska
+Swiatniki Gorne
+Swidnica
+Swidnik
+Swidwin
+Swiebodzice
+Swiebodzin
+Swiecie
+Swieradow Zdroj
+Swierzawa
+Swietochlowice
+Swinoujscie
 Tarnobrzeg
 Tarnogrod
 Tarnowskie Gory
@@ -809,7 +809,7 @@ Wladyslawowo
 Wloclawek
 Wlodawa
 Wloszczowa
-Wodzislaw slaski
+Wodzislaw Slaski
 Wojcieszow
 Wojkowice
 Wolbrom
@@ -844,7 +844,7 @@ Zawichost
 Zawidow
 Zawiercie
 Zabki
-Zabkowice slaskie
+Zabkowice Slaskie
 Zbaszynek
 Zbaszyn
 Zduny
@@ -863,18 +863,18 @@ Zlotow
 Zloty Stok
 Zwierzyniec
 Zwolen
-zabno
-zagan
-zarki
-zarow
-zary
-zelechow
-zerkow
-zmigrod
-znin
-zory
-zukowo
-zuromin
-zychlin
-zyrardow
-zywiec
+Zabno
+Zagan
+Zarki
+Zarow
+Zary
+Zelechow
+Zerkow
+Zmigrod
+Znin
+Zory
+Zukowo
+Zuromin
+Zychlin
+Zyrardow
+Zywiec

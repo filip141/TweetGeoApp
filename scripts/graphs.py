@@ -15,41 +15,35 @@ import pandas as pd
 
 
 # connect to the database
-#try:
-#    db = MongoBase(settings['db_addr'])
-#    data_cursor = db.get_dataset("location")
-#except Exception:
-#    print "Problem with databse occured when trying get access to data..."
-#    sys.exit(1);
+try:
+   db = MongoBase(settings['db_addr'])
+   data_cursor = db.get_dataset("location")
+except Exception:
+   print "Problem with databse occured when trying get access to data..."
+   sys.exit(1);
 
-data = []
+loc_counter = Counter()
 
-#get cities and write them to the file
-
-#for location in data_cursor:
-#    if location.get('location'):
-#        print(location["user"]["location"])
-#        data.append(location["user"]["location"])
-#        np.savetxt('dummy.txt', data, fmt="%s", delimiter=',')
+# #get cities and write them to the file
+for location in data_cursor:
+    loclist = [location["user"]["location"].lower()]
+    loc_counter.update(loclist)
 
 # count number of city occureences and write to .csv file with coordinates
-with open('dummy.txt', 'r') as m:
+with open("data.csv", 'w') as f:
+    fieldnames = ['counter', 'lat', 'lon', 'city']
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
 
-    counts = Counter(m)
-    with open("data.csv", 'w') as f:
-        fieldnames = ['counter', 'lat', 'lon', 'city']
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-
-        for city,counter in  counts.most_common(3000):
-            try:
-                geolocator = Nominatim()
-                location = geolocator.geocode(city)
-            except Exception:
-                print "Couldn't find location"
-                continue
-            city = city.strip("\n")
-            writer.writerow({'counter': counter, 'lat': location.latitude, 'lon': location.longitude, 'city': city })
+    for city,counter in  loc_counter.most_common(3000):
+        try:
+            geolocator = Nominatim()
+            location = geolocator.geocode(city)
+        except Exception:
+            print "Couldn't find location"
+            continue
+        city = city.strip("\n")
+        writer.writerow({'counter': counter, 'lat': location.latitude, 'lon': location.longitude, 'city': city })
 
 df = pd.read_csv('data.csv')
 df.head()

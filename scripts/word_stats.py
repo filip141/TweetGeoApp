@@ -60,7 +60,7 @@ class WordTokenizer(object):
 
 class WordStats(object):
 
-    def __init__(self, punfile="pinctation.txt", stopfile="stopwords.txt"):
+    def __init__(self, punfile="punctation.txt", stopfile="stopwords.txt"):
         self.tokenizer = WordTokenizer()
         self.__punfile=punfile
         self.__stopfile=stopfile

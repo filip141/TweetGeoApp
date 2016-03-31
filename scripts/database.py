@@ -32,17 +32,23 @@ class MongoBase(DataBase):
             print err
             raise
         self.db = dbcli.Tweets
+        self.db.temp.ensure_index([("id_str" , pymongo.ASCENDING), ("unique" , True), ("dropDups" , True)])
         self.tweet_num = self.db.user_tweets.count()
 
     ## Insert tweet in MongoDb
     def insert_Tweet(self, tweet_json):
-        self.db.user_tweets.insert(tweet_json)
+        try:
+            self.db.user_tweets.insert(tweet_json)
+        except pymongo.errors.DuplicateKeyError:
+            print "Not inserted, duplicate ! :(("
 
     ## Insert tweet in specified collection
     def insert_in_col(self, tweet_json, col):
         dbcol = self.db[col]
-        if not dbcol.find_one(tweet_json):
+        try:
             dbcol.insert(tweet_json)
+        except pymongo.errors.DuplicateKeyError:
+            print "Not inserted, duplicate ! :(("
 
     ## Get cursor to specific data
     def get_dataset(self, col, find_arg={}):
