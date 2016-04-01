@@ -7,6 +7,10 @@ from settings import settings
 
 
 class TweetFilter(object):
+    ''' Separate tweets with geo and correct
+    localization inserted to separate
+    database collecions '''
+
 
     aval_types = [ "user", "tweet"]
 
