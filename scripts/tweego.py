@@ -8,6 +8,10 @@ from settings import settings
 
 class FriendsGetter(threading.Thread):
 
+    '''Object execute breadth-first search
+       acquiring hist firends and his followers
+        tweets'''
+
     def __init__(self, api, lock):
         super(FriendsGetter, self).__init__()
         self.api = api
