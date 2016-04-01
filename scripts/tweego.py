@@ -83,6 +83,7 @@ class CustomStreamListener(tweepy.StreamListener):
         self.lock = threading.Lock()
         self.friends_get = FriendsGetter(api, self.lock)
         self.friends_get.set_db(self.db)
+        self.friends_get.setDaemon(True)
         self.friends_get.start()
 
     def on_status(self, status):
