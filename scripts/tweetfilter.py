@@ -11,10 +11,9 @@ class TweetFilter(object):
     localization inserted to separate
     database collecions '''
 
+    aval_types = ["user", "tweet"]
 
-    aval_types = [ "user", "tweet"]
-
-    ## Clas constructor
+    # Class constructor
     def __init__(self):
         try:
             self.db = MongoBase(settings['db_addr'])
@@ -23,65 +22,71 @@ class TweetFilter(object):
             print "Problem with databse occured when trying get access to data..."
             sys.exit(1)
 
-    ## Filter method, maches records in tweets jsons
+    # Filter method, matches records in tweets jsons
     def filter(self, atr="location", info_type="tweet", validate=True, save=True):
 
         # Throw value exception if type is not valid
-        if not info_type in self.aval_types:
+        if info_type not in self.aval_types:
             raise ValueError('Not valid information type...')
 
         num_mat = 0
         # iterate over tweets
         for tweet in self.data_cursor:
-                # Check information type
-                if info_type == self.aval_types[0]:
-                    res_data = tweet["user"]
+            # Check information type
+            short_text = unicodedata.normalize('NFD', tweet['text'])\
+                .encode('ascii', 'ignore')[:20]
+            if info_type == self.aval_types[0]:
+                res_data = tweet["user"]
+            else:
+                res_data = tweet
+            if res_data.get(atr):
+                # Remove polish characters if string is unicode
+                if isinstance(res_data[atr], unicode):
+                    value = unicodedata.normalize('NFD', res_data[atr]).encode('ascii', 'ignore')
                 else:
-                    res_data = tweet
-                if res_data.get(atr):
-                    # Remove polish characters if string is unicode
-                    if isinstance(res_data[atr], unicode):
-                        value = unicodedata.normalize('NFD', res_data[atr]).encode('ascii', 'ignore')
+                    value = str(res_data[atr])
+                # Increment match counter
+                num_mat += 1
+                # If validation set as True
+                if validate and atr == "location":
+                    city = self.validate_location(value)
+                    if not city:
+                        continue
                     else:
-                        value = str(res_data[atr])
-                    # Increment match counter
-                    num_mat = num_mat + 1
-                    # If validation set as True
-                    if validate and atr == "location" :
-                        city = self.validate_location(value)
-                        if not city:
-                            continue
-                        else:
-                            tweet["user"]["location"] = city
-                    if save:
-                        self.db.insert_in_col(tweet, atr)
-                    print "matches: " + str(num_mat) + " value: " + value
+                        tweet["user"]["location"] = city
+                if save:
+                    self.db.insert_in_col(tweet, atr)
+                print "[" + short_text + "...]" + "matches: " + str(num_mat) \
+                      + " value: " + value
         return num_mat
 
-    ## Method to verify location status
-    def validate_location(self, pcity):
+    # Method to verify location status
+    @staticmethod
+    def validate_location(pcity):
         with open(settings["cities_path"], 'r') as citi_file:
             for line in citi_file:
                 if line[:-1] in pcity:
                     return line[:-1]
         return None
 
-
     def gen_statfile(self, match_num, atr, sfile=settings["statfile_name"]):
         stats = {}
         json_data = {}
         with open(sfile, 'a+') as stat_file:
             stats["matches"] = match_num
-            stats["percent"] = str((100*match_num*1.0)/self.db.tweet_num) + "%"
+            stats["percent"] = str((100 * match_num * 1.0) / self.db.tweet_num) + "%"
             stats["path"] = "/" + atr
             json_data[atr] = stats
             json.dump(json_data, stat_file)
 
-    def rm_statfile(self, sfile=settings["statfile_name"]):
+    @staticmethod
+    def rm_statfile(sfile=settings["statfile_name"]):
         try:
-            os.remove(settings["statfile_name"])
-        except:
+            os.remove(sfile)
+        except OSError:
+            print "Error occurred while removing statefile"
             pass
+
 
 def main():
     tw = TweetFilter()
@@ -92,9 +97,5 @@ def main():
     tw.gen_statfile(geo, "geo")
 
 
-
 if __name__ == '__main__':
     main()
-
-
-

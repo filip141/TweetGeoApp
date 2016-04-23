@@ -1,8 +1,9 @@
 import pymongo
 from abc import ABCMeta, abstractmethod
 
-## Database interface, usefull in case
-## changing databse
+
+# Database interface, usefull in case
+# changing databse
 class DataBase(object):
 
     __metaclass__ = ABCMeta
@@ -19,30 +20,31 @@ class DataBase(object):
     def get_dataset(self, col, find_arg=""):
         pass
 
-## MongoDb object, inherits
-## Database and implements methods
+
+# MongoDb object, inherits
+# Database and implements methods
 class MongoBase(DataBase):
 
     def __init__(self, addr):
         try:
             # Init Mongo client
             dbcli = pymongo.MongoClient(addr)
-            self.__serv_info =  dbcli.server_info()
+            self.__serv_info = dbcli.server_info()
         except pymongo.errors.ServerSelectionTimeoutError as err:
             print err
             raise
         self.db = dbcli.Tweets
-        self.db.temp.ensure_index([("id_str" , pymongo.ASCENDING), ("unique" , True), ("dropDups" , True)])
+        self.db.temp.ensure_index([("id_str", pymongo.ASCENDING), ("unique", True), ("dropDups", True)])
         self.tweet_num = self.db.user_tweets.count()
 
-    ## Insert tweet in MongoDb
+    # Insert tweet in MongoDb
     def insert_Tweet(self, tweet_json):
         try:
             self.db.user_tweets.insert(tweet_json)
         except pymongo.errors.DuplicateKeyError:
             print "Not inserted, duplicate ! :(("
 
-    ## Insert tweet in specified collection
+    # Insert tweet in specified collection
     def insert_in_col(self, tweet_json, col):
         dbcol = self.db[col]
         try:
@@ -50,7 +52,7 @@ class MongoBase(DataBase):
         except pymongo.errors.DuplicateKeyError:
             print "Not inserted, duplicate ! :(("
 
-    ## Get cursor to specific data
+    # Get cursor to specific data
     def get_dataset(self, col, find_arg={}):
         # Check collection existence
         if col in self.db.collection_names():
