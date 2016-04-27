@@ -34,7 +34,7 @@ class MongoBase(DataBase):
             print err
             raise
         self.db = dbcli.Tweets
-        self.db.temp.ensure_index([("id_str", pymongo.ASCENDING), ("unique", True), ("dropDups", True)])
+        self.db.user_tweets.ensure_index([("id_str", pymongo.ASCENDING), ("unique", True), ("dropDups", True)])
         self.tweet_num = self.db.user_tweets.count()
 
     # Insert tweet in MongoDb
