@@ -1,5 +1,5 @@
+import json
 import numpy as np
-from geopy.geocoders import Nominatim
 
 
 class GeoMap(object):
@@ -8,7 +8,9 @@ class GeoMap(object):
 
     def __init__(self, ulatitude, dlatitude, llongitude, rlongitude, precision=0.3):
         self.precision = precision
-        self.geolocator = Nominatim()
+        with open("../data/coords.json", 'w') as coords_file:
+            coords = json.loads(coords_file)
+        self.citi_coords = coords
         self.dlatitude = np.array(dlatitude)
         self.llongitude = np.array(llongitude)
         # Calculate kilometers from longitude and latitude
@@ -28,12 +30,17 @@ class GeoMap(object):
 
     # Convert city name to array coords
     def citi2idx(self, city):
-        location = self.geolocator.geocode(city)
-        return self.coords2idx(location.latitude, location.longitude)
+        coords_dict = self.citi_coords
+        print coords_dict
+        # for mcity in coords_dict.iteritems():
+        #     print mcity
+            # if mcity == city:
+            #     return 0
+        # return self.coords2idx(location.latitude, location.longitude)
 
     # Set city position
     def set_position(self, position, votes):
-        if position < self.country_map.shape and position > (0, 0):
+        if self.country_map.shape > position > (0, 0):
             self.country_map[position[0], position[1]] = votes
 
     # Clean country map
@@ -42,3 +49,9 @@ class GeoMap(object):
 
 
 
+if __name__ == '__main__':
+    poland_latitude = (54.83, 49.0)
+    poland_longitude = (14.12, 24.15)
+    geo_map = GeoMap(poland_latitude[0], poland_latitude[1],
+                     poland_longitude[0], poland_longitude[1], precision=2)
+    geo_map.citi2idx("Warszawa")
