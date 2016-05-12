@@ -1,6 +1,7 @@
 import re
 import ast
 import json
+import time
 import numpy as np
 import unicodedata
 from geomap import GeoMap
@@ -138,7 +139,8 @@ class CityStats(object):
             json.dump(citi_dict, fp)
         return citi_dict
 
-    def get_words(self, stjson_path="words_statistic.json"):
+    @staticmethod
+    def get_words(stjson_path="words_statistic.json"):
         word_list = []
         # Read words dictionary from json file
         with open(stjson_path) as data_file:
@@ -149,6 +151,38 @@ class CityStats(object):
         word_list = set(word_list)
         return word_list, citi_dict
 
+    @staticmethod
+    def max_likelihood(c_param, alpha, c_mass, coords_list, ncoords_list):
+        f_sum = 0
+        eps = np.finfo(float).eps
+        for pcoord in coords_list:
+            dist = GeoMap.distance(c_mass, pcoord)
+            if dist:
+                f_sum += np.log(c_param * dist**(-alpha))
+        for ncoord in ncoords_list:
+            dist = GeoMap.distance(c_mass, ncoord)
+            prob = c_param * dist**(-alpha)
+            if prob > 1:
+                f_sum += np.log(eps)
+            else:
+                f_sum += np.log(1 - prob)
+        return f_sum
+
+    def find_parameters(self, start, end, c_mass, coords_list, ncoords_list, precision):
+        f_list = []
+        start = [int(x / precision) for x in start]
+        end = [int(y / precision) for y in end]
+        for i in range(start[0], end[0]):
+            c = i * precision
+            for j in range(start[1], end[1]):
+                alpha = j * precision
+                f_like = CityStats.max_likelihood(c, alpha, c_mass, coords_list, ncoords_list)
+                f_list.append((f_like, c, alpha))
+        f_only = [tpl[0] for tpl in f_list]
+        max_val = max(f_only)
+        print f_list[f_only.index(max_val)]
+
+
     def local_words(self, stjson="words_statistic.json"):
         # Read word list
         words, citi_dict = self.get_words(stjson_path=stjson)
@@ -156,24 +190,30 @@ class CityStats(object):
         for word in words:
             matched_freqs = []
             coords_list = []
+            ncoords_list =[]
             self.geo_map.clean()
             for city, value in citi_dict.iteritems():
-                list_element = [ freq for match, freq
-                                 in value.iteritems() if match == word
-                                 ]
-                if list_element:
-                    coords = self.geo_map.citi2idx(city)
-                    coords_list.append(coords)
-                    # self.geo_map.set_position(coords, list_element[0][1])
-                    matched_freqs.append(list_element[0])
-            c_mass = np.sum([(coord[0] * freq, coord[1] * freq)
-                             for coord, freq in zip(coords_list, matched_freqs)],
-                            axis=0)
-            c_mass /= np.sum(matched_freqs, axis=0)
-            print c_mass
-
-
-
+                coords = self.geo_map.citi2idx(city)
+                if coords:
+                    list_element = [freq for match, freq
+                                    in value.iteritems() if match == word
+                                    ]
+                    if list_element:
+                        coords_list.append(coords)
+                        matched_freqs.append(list_element[0])
+                    else:
+                        ncoords_list.append(coords)
+            # If matched frequencies not empty
+            if matched_freqs:
+                c_mass = np.sum([(coord[0] * freq, coord[1] * freq)
+                                 for coord, freq in zip(coords_list, matched_freqs)],
+                                axis=0)
+                c_mass /= np.sum(matched_freqs, axis=0)
+                start = [0.1, 0.1]
+                end = [2.0, 2.0]
+                print word
+                print coords_list
+                self.find_parameters(start, end, c_mass, coords_list, ncoords_list, 0.1)
 
 
 def main():

@@ -8,8 +8,8 @@ class GeoMap(object):
 
     def __init__(self, ulatitude, dlatitude, llongitude, rlongitude, precision=0.3):
         self.precision = precision
-        with open("../data/coords.json", 'w') as coords_file:
-            coords = json.loads(coords_file)
+        with open("../data/coords.json", 'r') as coords_file:
+            coords = json.loads(coords_file.read())
         self.citi_coords = coords
         self.dlatitude = np.array(dlatitude)
         self.llongitude = np.array(llongitude)
@@ -31,12 +31,14 @@ class GeoMap(object):
     # Convert city name to array coords
     def citi2idx(self, city):
         coords_dict = self.citi_coords
-        print coords_dict
-        # for mcity in coords_dict.iteritems():
-        #     print mcity
-            # if mcity == city:
-            #     return 0
-        # return self.coords2idx(location.latitude, location.longitude)
+        for mcity, value in coords_dict.iteritems():
+            # City found
+            if mcity == city:
+                idx_tuple = self.coords2idx(value[0], value[1])
+                # Tuple is not correct index
+                if idx_tuple[0] > 0 and idx_tuple[1] > 0:
+                    return idx_tuple
+        return None
 
     # Set city position
     def set_position(self, position, votes):
@@ -47,11 +49,7 @@ class GeoMap(object):
     def clean(self):
         self.country_map = np.zeros(self.country_map.shape)
 
-
-
-if __name__ == '__main__':
-    poland_latitude = (54.83, 49.0)
-    poland_longitude = (14.12, 24.15)
-    geo_map = GeoMap(poland_latitude[0], poland_latitude[1],
-                     poland_longitude[0], poland_longitude[1], precision=2)
-    geo_map.citi2idx("Warszawa")
+    # Distance between two points
+    @staticmethod
+    def distance(point_one, point_two):
+        return np.sqrt((point_one[0] - point_two[0])**2 + (point_one[1] - point_two[1])**2)

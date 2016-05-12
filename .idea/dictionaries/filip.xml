@@ -5,11 +5,19 @@
       <w>coords</w>
       <w>dlatitude</w>
       <w>dlong</w>
+      <w>freqs</w>
       <w>lati</w>
       <w>latt</w>
       <w>llongitude</w>
+      <w>mcity</w>
+      <w>ncoord</w>
+      <w>ncoords</w>
       <w>ntimes</w>
+      <w>pcoord</w>
+      <w>punctation</w>
+      <w>punfile</w>
       <w>rlongitude</w>
+      <w>stopfile</w>
       <w>ulatitude</w>
     </words>
   </dictionary>
