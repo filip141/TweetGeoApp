@@ -219,8 +219,8 @@ class CityStats(object):
 def main():
     ct = CityStats(db_addr=settings["db_addr"], punfile=settings["punfile_name"]
                    , stopfile=settings["stopfile_name"])
-    # citi_dict = ct.count_citywords(city_path=settings["cities_path"], stjson_path=settings["statistic_json"])
-    ct.local_words(stjson=settings["statistic_json"])
+    citi_dict = ct.count_citywords(city_path=settings["cities_path"], stjson_path=settings["statistic_json"])
+    # ct.local_words(stjson=settings["statistic_json"])
 
 
 if __name__ == '__main__':
