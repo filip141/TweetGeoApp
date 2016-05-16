@@ -1,11 +1,18 @@
 <component name="ProjectDictionaryState">
   <dictionary name="filip">
     <words>
+      <w>addr</w>
       <w>citi</w>
+      <w>citywords</w>
+      <w>coef</w>
+      <w>coeff</w>
       <w>coords</w>
+      <w>difflist</w>
+      <w>djson</w>
       <w>dlatitude</w>
       <w>dlong</w>
       <w>freqs</w>
+      <w>jaccard</w>
       <w>lati</w>
       <w>latt</w>
       <w>llongitude</w>
@@ -13,10 +20,13 @@
       <w>ncoord</w>
       <w>ncoords</w>
       <w>ntimes</w>
+      <w>nword</w>
       <w>pcoord</w>
+      <w>preprocess</w>
       <w>punctation</w>
       <w>punfile</w>
       <w>rlongitude</w>
+      <w>stjson</w>
       <w>stopfile</w>
       <w>ulatitude</w>
     </words>

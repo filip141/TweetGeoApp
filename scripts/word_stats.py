@@ -1,7 +1,7 @@
 import re
 import ast
 import json
-import time
+import difflib
 import numpy as np
 import unicodedata
 from geomap import GeoMap
@@ -84,13 +84,19 @@ class WordStats(object):
     def word_counter(self, json_base):
         tweets_counter = Counter()
         stop = self.stop + self.punctation + ["rt"]
-        for json in json_base:
-            json_text = unicodedata.normalize('NFD', json.get("text")).encode('ascii', 'ignore')
+        for djson in json_base:
+            json_text = unicodedata.normalize('NFD', djson.get("text")).encode('ascii', 'ignore')
             str_words = self.tokenizer.preprocess(json_text, lowercase=True,
                                                   words_only=True)
             str_words = [term for term in str_words if term not in stop]
             tweets_counter.update(str_words)
         return tweets_counter
+
+    @staticmethod
+    def jaccard_similarity(x, y):
+        intersection_cardinality = len(set.intersection(*[set(x), set(y)]))
+        union_cardinality = len(set.union(*[set(x), set(y)]))
+        return intersection_cardinality / float(union_cardinality)
 
 
 class CityStats(object):
@@ -135,16 +141,20 @@ class CityStats(object):
             words_found.append(res)
             print city, res
         citi_dict = dict(zip(cities, words_found))
+        words, citi_dict = self.get_words(citi_dict=citi_dict)
+        _, citi_dict = self.similar_words(words, citi_dict)
         with open(stjson_path, 'w') as fp:
             json.dump(citi_dict, fp)
         return citi_dict
 
     @staticmethod
-    def get_words(stjson_path="words_statistic.json"):
+    def get_words(stjson_path="words_statistic.json", citi_dict=None):
         word_list = []
-        # Read words dictionary from json file
-        with open(stjson_path) as data_file:
-            citi_dict = json.load(data_file)
+        # If city dictionary passed as value do nothing
+        if citi_dict:
+            # Read words dictionary from json file
+            with open(stjson_path) as data_file:
+                citi_dict = json.load(data_file)
         for city, value in citi_dict.iteritems():
             for word, ntimes in value.iteritems():
                 word_list.append(word)
@@ -168,7 +178,8 @@ class CityStats(object):
                 f_sum += np.log(1 - prob)
         return f_sum
 
-    def find_parameters(self, start, end, c_mass, coords_list, ncoords_list, precision):
+    @staticmethod
+    def find_parameters(start, end, c_mass, coords_list, ncoords_list, precision):
         f_list = []
         start = [int(x / precision) for x in start]
         end = [int(y / precision) for y in end]
@@ -182,6 +193,32 @@ class CityStats(object):
         max_val = max(f_only)
         print f_list[f_only.index(max_val)]
 
+    def similar_words(self, words, citi_dict):
+        no_repeat = words
+        # Iterate over words in word list
+        for word_1 in no_repeat:
+            difflist = difflib.get_close_matches(word_1, no_repeat, n=6)
+            print difflist
+            sim_words = []
+            for word_2 in difflist:
+                jaccard_coeff = self.word_stats.jaccard_similarity(word_1, word_2)
+                if jaccard_coeff > 0.9:
+                    sim_words.append(word_2)
+            no_repeat = [word_1 if nword in sim_words else nword
+                         for nword in no_repeat]
+            no_repeat = set(no_repeat)
+            for city, value in citi_dict.iteritems():
+                similar_sum = 0
+                citi_words = {}
+                for cword, ntimes in value.iteritems():
+                    if cword in sim_words:
+                        similar_sum += ntimes
+                    else:
+                        citi_words[cword] = ntimes
+                if similar_sum:
+                    citi_words[word_1] = similar_sum
+                    citi_dict[city] = citi_words
+        return no_repeat, citi_words
 
     def local_words(self, stjson="words_statistic.json"):
         # Read word list
@@ -190,7 +227,7 @@ class CityStats(object):
         for word in words:
             matched_freqs = []
             coords_list = []
-            ncoords_list =[]
+            ncoords_list = []
             self.geo_map.clean()
             for city, value in citi_dict.iteritems():
                 coords = self.geo_map.citi2idx(city)
@@ -221,7 +258,6 @@ def main():
                    , stopfile=settings["stopfile_name"])
     citi_dict = ct.count_citywords(city_path=settings["cities_path"], stjson_path=settings["statistic_json"])
     # ct.local_words(stjson=settings["statistic_json"])
-
 
 if __name__ == '__main__':
     main()
