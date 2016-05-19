@@ -151,7 +151,7 @@ class CityStats(object):
     def get_words(stjson_path="words_statistic.json", citi_dict=None):
         word_list = []
         # If city dictionary passed as value do nothing
-        if citi_dict:
+        if not citi_dict:
             # Read words dictionary from json file
             with open(stjson_path) as data_file:
                 citi_dict = json.load(data_file)
@@ -198,7 +198,6 @@ class CityStats(object):
         # Iterate over words in word list
         for word_1 in no_repeat:
             difflist = difflib.get_close_matches(word_1, no_repeat, n=6)
-            print difflist
             sim_words = []
             for word_2 in difflist:
                 jaccard_coeff = self.word_stats.jaccard_similarity(word_1, word_2)
@@ -218,7 +217,7 @@ class CityStats(object):
                 if similar_sum:
                     citi_words[word_1] = similar_sum
                     citi_dict[city] = citi_words
-        return no_repeat, citi_words
+        return no_repeat, citi_dict
 
     def local_words(self, stjson="words_statistic.json"):
         # Read word list
@@ -256,8 +255,10 @@ class CityStats(object):
 def main():
     ct = CityStats(db_addr=settings["db_addr"], punfile=settings["punfile_name"]
                    , stopfile=settings["stopfile_name"])
-    citi_dict = ct.count_citywords(city_path=settings["cities_path"], stjson_path=settings["statistic_json"])
+    # citi_dict = ct.count_citywords(city_path=settings["cities_path"], stjson_path=settings["statistic_json"])
     # ct.local_words(stjson=settings["statistic_json"])
+    words, citi_dict = ct.get_words(stjson_path=settings["statistic_json"])
+    _, citi_dict = ct.similar_words(words, citi_dict)
 
 if __name__ == '__main__':
     main()
