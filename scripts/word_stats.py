@@ -1,7 +1,10 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import re
 import ast
 import json
-import difflib
+import time
+import morfeusz2
 import numpy as np
 import unicodedata
 from geomap import GeoMap
@@ -39,12 +42,16 @@ class WordTokenizer(object):
     '''
 
     def __init__(self):
-        self.tokens_re = re.compile(r'(' + '|'.join(regex_str) + ')', re.VERBOSE | re.IGNORECASE)
-        self.emoticon_re = re.compile(r'^' + emoticons_str + '$', re.VERBOSE | re.IGNORECASE)
-        self.undef_re = re.compile(r'^' + regex_str[-1] + '$', re.VERBOSE | re.IGNORECASE)
-        self.men_re = re.compile(r'^' + regex_str[2] + '$', re.VERBOSE | re.IGNORECASE)
+        self.tokens_re = re.compile(r'(' + '|'.join(regex_str) + ')',
+                                    re.UNICODE | re.VERBOSE | re.IGNORECASE)
+        self.emoticon_re = re.compile(r'^' + emoticons_str + '$',
+                                      re.UNICODE | re.VERBOSE | re.IGNORECASE)
+        self.undef_re = re.compile(r'^' + regex_str[-1] + '$',
+                                   re.UNICODE | re.VERBOSE | re.IGNORECASE)
+        self.men_re = re.compile(r'^' + regex_str[2] + '$',
+                                 re.UNICODE | re.VERBOSE | re.IGNORECASE)
         self.url_re = re.compile(r'(' + '|'.join([regex_str[1], regex_str[4]]) + ')',
-                                 re.VERBOSE | re.IGNORECASE)
+                                 re.UNICODE | re.VERBOSE | re.IGNORECASE)
 
     def tokenize(self, word):
         return self.tokens_re.findall(word)
@@ -75,21 +82,21 @@ class WordStats(object):
             self.punctation = ast.literal_eval(punf.read())
         # Load list of stop words characters from file
         with open(self.__stopfile) as stopf:
-            stop = ast.literal_eval(stopf.read())
-            self.stop = [unicodedata.normalize('NFD', word).encode('ascii', 'ignore')
-                         for word in stop
-                         ]
+            self.stop = ast.literal_eval(stopf.read())
 
     # Counting word occurrence in tweets
     def word_counter(self, json_base):
         tweets_counter = Counter()
         stop = self.stop + self.punctation + ["rt"]
         for djson in json_base:
-            json_text = unicodedata.normalize('NFD', djson.get("text")).encode('ascii', 'ignore')
+            json_text = djson.get("text")
             str_words = self.tokenizer.preprocess(json_text, lowercase=True,
                                                   words_only=True)
             str_words = [term for term in str_words if term not in stop]
-            tweets_counter.update(str_words)
+            an_words = []
+            for mword in str_words:
+                an_words.append(self.get_polish_letters(mword))
+            tweets_counter.update(an_words)
         return tweets_counter
 
     @staticmethod
@@ -97,6 +104,12 @@ class WordStats(object):
         intersection_cardinality = len(set.intersection(*[set(x), set(y)]))
         union_cardinality = len(set.union(*[set(x), set(y)]))
         return intersection_cardinality / float(union_cardinality)
+
+    @staticmethod
+    def get_polish_letters(word):
+        morf = morfeusz2.Morfeusz()
+        sword = morf.analyse(word)
+        return sword[0][2][1].split(":")[0]
 
 
 class CityStats(object):
@@ -110,6 +123,7 @@ class CityStats(object):
                               CityStats.poland_longitude[0], CityStats.poland_longitude[1], precision=2)
         self.mn_db = MongoBase(db_addr)
         self.word_stats = WordStats(punfile=punfile, stopfile=stopfile)
+        self.word_stats.get_polish_letters("zajebane".decode('utf-8'))
 
     # get tweets from specified city
     def get_json_list(self, basename, city):
@@ -132,6 +146,10 @@ class CityStats(object):
         res = {key: value for (key, value) in res.iteritems() if value > 1}
         return res
 
+    @staticmethod
+    def repr_dict(d):
+        return '{%s}' % ',\n'.join("'%s': '%s'" % pair for pair in d.iteritems())
+
     # Count tweet words for specified location
     def count_citywords(self, city_path="cities.txt", stjson_path="words_statistic.json"):
         words_found = []
@@ -139,10 +157,8 @@ class CityStats(object):
         for city in cities:
             res = self.get_word_freq(city)
             words_found.append(res)
-            print city, res
+            print city, self.repr_dict(res)
         citi_dict = dict(zip(cities, words_found))
-        words, citi_dict = self.get_words(citi_dict=citi_dict)
-        _, citi_dict = self.similar_words(words, citi_dict)
         with open(stjson_path, 'w') as fp:
             json.dump(citi_dict, fp)
         return citi_dict
@@ -193,32 +209,6 @@ class CityStats(object):
         max_val = max(f_only)
         print f_list[f_only.index(max_val)]
 
-    def similar_words(self, words, citi_dict):
-        no_repeat = words
-        # Iterate over words in word list
-        for word_1 in no_repeat:
-            difflist = difflib.get_close_matches(word_1, no_repeat, n=6)
-            sim_words = []
-            for word_2 in difflist:
-                jaccard_coeff = self.word_stats.jaccard_similarity(word_1, word_2)
-                if jaccard_coeff > 0.9:
-                    sim_words.append(word_2)
-            no_repeat = [word_1 if nword in sim_words else nword
-                         for nword in no_repeat]
-            no_repeat = set(no_repeat)
-            for city, value in citi_dict.iteritems():
-                similar_sum = 0
-                citi_words = {}
-                for cword, ntimes in value.iteritems():
-                    if cword in sim_words:
-                        similar_sum += ntimes
-                    else:
-                        citi_words[cword] = ntimes
-                if similar_sum:
-                    citi_words[word_1] = similar_sum
-                    citi_dict[city] = citi_words
-        return no_repeat, citi_dict
-
     def local_words(self, stjson="words_statistic.json"):
         # Read word list
         words, citi_dict = self.get_words(stjson_path=stjson)
@@ -255,10 +245,9 @@ class CityStats(object):
 def main():
     ct = CityStats(db_addr=settings["db_addr"], punfile=settings["punfile_name"]
                    , stopfile=settings["stopfile_name"])
-    # citi_dict = ct.count_citywords(city_path=settings["cities_path"], stjson_path=settings["statistic_json"])
+    citi_dict = ct.count_citywords(city_path=settings["cities_path"], stjson_path=settings["statistic_json"])
     # ct.local_words(stjson=settings["statistic_json"])
-    words, citi_dict = ct.get_words(stjson_path=settings["statistic_json"])
-    _, citi_dict = ct.similar_words(words, citi_dict)
+
 
 if __name__ == '__main__':
     main()
