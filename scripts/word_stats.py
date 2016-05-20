@@ -75,6 +75,7 @@ class WordTokenizer(object):
 class WordStats(object):
     def __init__(self, punfile="punctation.txt", stopfile="stopwords.txt"):
         self.tokenizer = WordTokenizer()
+        self.morf = morfeusz2.Morfeusz()
         self.__punfile = punfile
         self.__stopfile = stopfile
         # Load list of punctation characters from file
@@ -105,10 +106,8 @@ class WordStats(object):
         union_cardinality = len(set.union(*[set(x), set(y)]))
         return intersection_cardinality / float(union_cardinality)
 
-    @staticmethod
-    def get_polish_letters(word):
-        morf = morfeusz2.Morfeusz()
-        sword = morf.analyse(word)
+    def get_polish_letters(self, word):
+        sword = self.morf.analyse(word)
         return sword[0][2][1].split(":")[0]
 
 
@@ -194,8 +193,7 @@ class CityStats(object):
                 f_sum += np.log(1 - prob)
         return f_sum
 
-    @staticmethod
-    def find_parameters(start, end, c_mass, coords_list, ncoords_list, precision):
+    def find_parameters(self, start, end, c_mass, coords_list, ncoords_list, precision):
         f_list = []
         start = [int(x / precision) for x in start]
         end = [int(y / precision) for y in end]
@@ -207,7 +205,10 @@ class CityStats(object):
                 f_list.append((f_like, c, alpha))
         f_only = [tpl[0] for tpl in f_list]
         max_val = max(f_only)
-        print f_list[f_only.index(max_val)]
+        word_params = f_list[f_only.index(max_val)]
+        if c_mass[0] == 171:
+            self.geo_map.multi_exp(c_mass, word_params[1], word_params[2])
+
 
     def local_words(self, stjson="words_statistic.json"):
         # Read word list
@@ -225,12 +226,15 @@ class CityStats(object):
                                     in value.iteritems() if match == word
                                     ]
                     if list_element:
+                        self.geo_map.set_position(coords, value[word])
                         coords_list.append(coords)
                         matched_freqs.append(list_element[0])
                     else:
                         ncoords_list.append(coords)
             # If matched frequencies not empty
             if matched_freqs:
+                if word == "targi":
+                    surf(self.geo_map.country_map)
                 c_mass = np.sum([(coord[0] * freq, coord[1] * freq)
                                  for coord, freq in zip(coords_list, matched_freqs)],
                                 axis=0)
@@ -238,6 +242,7 @@ class CityStats(object):
                 start = [0.1, 0.1]
                 end = [2.0, 2.0]
                 print word
+                print c_mass
                 print coords_list
                 self.find_parameters(start, end, c_mass, coords_list, ncoords_list, 0.1)
 
@@ -245,8 +250,8 @@ class CityStats(object):
 def main():
     ct = CityStats(db_addr=settings["db_addr"], punfile=settings["punfile_name"]
                    , stopfile=settings["stopfile_name"])
-    citi_dict = ct.count_citywords(city_path=settings["cities_path"], stjson_path=settings["statistic_json"])
-    # ct.local_words(stjson=settings["statistic_json"])
+    # citi_dict = ct.count_citywords(city_path=settings["cities_path"], stjson_path=settings["statistic_json"])
+    ct.local_words(stjson=settings["statistic_json"])
 
 
 if __name__ == '__main__':

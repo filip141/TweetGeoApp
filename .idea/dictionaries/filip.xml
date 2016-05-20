@@ -7,6 +7,7 @@
       <w>coef</w>
       <w>coeff</w>
       <w>coords</w>
+      <w>cshape</w>
       <w>difflist</w>
       <w>djson</w>
       <w>dlatitude</w>
@@ -17,6 +18,8 @@
       <w>latt</w>
       <w>llongitude</w>
       <w>mcity</w>
+      <w>meshx</w>
+      <w>meshy</w>
       <w>morf</w>
       <w>mword</w>
       <w>ncoord</w>

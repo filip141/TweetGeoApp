@@ -1,5 +1,6 @@
 import json
 import numpy as np
+from surf import surf
 
 
 class GeoMap(object):
@@ -53,3 +54,21 @@ class GeoMap(object):
     @staticmethod
     def distance(point_one, point_two):
         return np.sqrt((point_one[0] - point_two[0])**2 + (point_one[1] - point_two[1])**2)
+
+    def multi_exp(self, cmass, c_coeff, alpha):
+        cshape = self.country_map.shape
+        x = np.arange(0, cshape[1])
+        y = np.arange(0, cshape[1])
+        meshx, meshy = np.meshgrid(x, y)
+        dist = np.sqrt((meshx - cmass[0])**2 + (meshy - cmass[1])**2)
+        exp_surf = c_coeff * dist**-alpha
+        surf(exp_surf, x, y)
+
+
+# if __name__ == '__main__':
+#     poland_latitude = (54.83, 49.0)
+#     poland_longitude = (14.12, 24.15)
+#     gm = GeoMap(poland_latitude[0], poland_latitude[1],
+#                               poland_longitude[0], poland_longitude[1], precision=2)
+#     gm.multi_exp()
+
