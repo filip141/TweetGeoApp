@@ -206,7 +206,7 @@ class CityStats(object):
         f_only = [tpl[0] for tpl in f_list]
         max_val = max(f_only)
         word_params = f_list[f_only.index(max_val)]
-        if not c_mass[0] == 171:
+        if c_mass[0] == 171:
             self.geo_map.multi_exp(c_mass, word_params[1], word_params[2])
 
 
@@ -233,7 +233,7 @@ class CityStats(object):
                         ncoords_list.append(coords)
             # If matched frequencies not empty
             if matched_freqs:
-                if not word == "targi":
+                if word == "targi":
                     surf(self.geo_map.country_map)
                 c_mass = np.sum([(coord[0] * freq, coord[1] * freq)
                                  for coord, freq in zip(coords_list, matched_freqs)],
