@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="2c032119-3200-41ec-a95e-c1b872eb6dd0" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/word_stats.py" afterPath="$PROJECT_DIR$/scripts/word_stats.py" />
     </list>
     <ignored path="TweetGeoApp.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -97,7 +96,13 @@
         <option value="filip141 &lt;filip141@gmail.com&gt;" />
       </list>
     </option>
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="6bfc9f43e7b3f5b97c67f4c37b7c0f94a3ca7884" />
+      </map>
+    </option>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -209,7 +214,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="pyconsole" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="last_opened_file_path" value="$USER_HOME$" />
   </component>
