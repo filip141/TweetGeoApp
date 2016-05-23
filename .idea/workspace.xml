@@ -26,6 +26,30 @@
       <file leaf-file-name="surf.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/surf.py">
           <provider selected="true" editor-type-id="text-editor">
+    </list>
+    <ignored path="TweetGeoApp.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="TweetGeoApp" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="surf.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/scripts/surf.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
             <state vertical-scroll-proportion="0.0">
               <caret line="10" column="33" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="33" />
               <folding>
@@ -96,7 +120,13 @@
         <option value="filip141 &lt;filip141@gmail.com&gt;" />
       </list>
     </option>
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="6bfc9f43e7b3f5b97c67f4c37b7c0f94a3ca7884" />
+      </map>
+    </option>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -208,7 +238,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="pyconsole" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="last_opened_file_path" value="$USER_HOME$" />
   </component>
@@ -480,7 +510,9 @@
     <MESSAGE value="similiar words" />
     <MESSAGE value="similiar words fix 2" />
     <MESSAGE value="morfeus fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="morfeus fix" />
+    <MESSAGE value="exponential distribution" />
+    <MESSAGE value="surf geo_dist" />
+    <option name="LAST_COMMIT_MESSAGE" value="surf geo_dist" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -854,6 +886,7 @@
     <entry file="file://$PROJECT_DIR$/scripts/surf.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
+        <state vertical-scroll-proportion="0.0">
           <caret line="10" column="33" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="33" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
@@ -868,6 +901,14 @@
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/words_statistic.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.055900622">
+          <caret line="0" column="12054" selection-start-line="0" selection-start-column="12045" selection-end-line="0" selection-end-column="12054" />
+          <folding />
         </state>
       </provider>
     </entry>
