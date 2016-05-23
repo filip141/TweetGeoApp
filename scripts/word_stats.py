@@ -209,7 +209,6 @@ class CityStats(object):
         if c_mass[0] == 171:
             self.geo_map.multi_exp(c_mass, word_params[1], word_params[2])
 
-
     def local_words(self, stjson="words_statistic.json"):
         # Read word list
         words, citi_dict = self.get_words(stjson_path=stjson)
