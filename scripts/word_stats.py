@@ -3,10 +3,8 @@
 import re
 import ast
 import json
-import time
 import morfeusz2
 import numpy as np
-import unicodedata
 from geomap import GeoMap
 from database import MongoBase
 from settings import settings
@@ -122,7 +120,6 @@ class CityStats(object):
                               CityStats.poland_longitude[0], CityStats.poland_longitude[1], precision=2)
         self.mn_db = MongoBase(db_addr)
         self.word_stats = WordStats(punfile=punfile, stopfile=stopfile)
-        self.word_stats.get_polish_letters("zajebane".decode('utf-8'))
 
     # get tweets from specified city
     def get_json_list(self, basename, city):
@@ -206,12 +203,14 @@ class CityStats(object):
         f_only = [tpl[0] for tpl in f_list]
         max_val = max(f_only)
         word_params = f_list[f_only.index(max_val)]
-        if c_mass[0] == 171:
-            self.geo_map.multi_exp(c_mass, word_params[1], word_params[2])
+        return word_params
+        # if c_mass[0] == 164:
+        #     self.geo_map.multi_exp(c_mass, word_params[1], word_params[2])
 
     def local_words(self, stjson="words_statistic.json"):
         # Read word list
         words, citi_dict = self.get_words(stjson_path=stjson)
+        param_file = open('../data/local_params.dat', 'a+')
         # Iterate over words
         for word in words:
             matched_freqs = []
@@ -225,25 +224,30 @@ class CityStats(object):
                                     in value.iteritems() if match == word
                                     ]
                     if list_element:
-                        self.geo_map.set_position(coords, value[word])
+                        # self.geo_map.set_position(coords, value[word])
                         coords_list.append(coords)
                         matched_freqs.append(list_element[0])
                     else:
                         ncoords_list.append(coords)
             # If matched frequencies not empty
             if matched_freqs:
-                if word == "targi":
-                    surf(self.geo_map.country_map)
+                # if word == "targi":
+                #     surf(self.geo_map.country_map)
                 c_mass = np.sum([(coord[0] * freq, coord[1] * freq)
                                  for coord, freq in zip(coords_list, matched_freqs)],
                                 axis=0)
                 c_mass /= np.sum(matched_freqs, axis=0)
                 start = [0.1, 0.1]
                 end = [2.0, 2.0]
-                print word
-                print c_mass
-                print coords_list
-                self.find_parameters(start, end, c_mass, coords_list, ncoords_list, 0.1)
+                if len(coords_list) > 5:
+                    print word
+                    print c_mass
+                    print coords_list
+                    word_params = self.find_parameters(start, end, c_mass,
+                                                       coords_list, ncoords_list, 0.1)
+                    param_file.write(str(word_params))
+        param_file.close()
+
 
 
 def main():
