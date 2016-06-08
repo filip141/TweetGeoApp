@@ -26,7 +26,7 @@ regex_str = [
     r'http[s]?://(?:[a-z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-f][0-9a-f]))+',  # URLs
 
     r'(?:(?:\d+,?)+(?:\.?\d+)?)',  # numbers
-    r"(?:[a-z][a-z'\-_]+[a-z])",  # words with - and '
+    # r"(?:[a-z][a-z'\-_]+[a-z])",  # words with - and '
     r'(?:[\w_]+)',  # other words
     r'(?:\S)'  # anything else
 ]
@@ -55,6 +55,7 @@ class WordTokenizer(object):
         return self.tokens_re.findall(word)
 
     def preprocess(self, s, lowercase=False, words_only=False):
+        s = s.lower()
         tokens = self.tokenize(s)
         if words_only:
             tokens = [token
@@ -98,6 +99,16 @@ class WordStats(object):
             tweets_counter.update(an_words)
         return tweets_counter
 
+    def divide_tweet(self, text):
+        stop = self.stop + self.punctation + ["rt"]
+        str_words = self.tokenizer.preprocess(text, lowercase=True,
+                                              words_only=True)
+        str_words = [term for term in str_words if term not in stop]
+        an_words = []
+        for mword in str_words:
+            an_words.append(self.get_polish_letters(mword))
+        return an_words
+
     @staticmethod
     def jaccard_similarity(x, y):
         intersection_cardinality = len(set.intersection(*[set(x), set(y)]))
@@ -106,7 +117,7 @@ class WordStats(object):
 
     def get_polish_letters(self, word):
         sword = self.morf.analyse(word)
-        return sword[0][2][1].split(":")[0]
+        return sword[0][2][1].split(":")[0].lower()
 
 
 class CityStats(object):
@@ -213,42 +224,45 @@ class CityStats(object):
         param_file = open('../data/local_params.dat', 'a+')
         # Iterate over words
         for word in words:
-            matched_freqs = []
-            coords_list = []
-            ncoords_list = []
-            self.geo_map.clean()
-            for city, value in citi_dict.iteritems():
-                coords = self.geo_map.citi2idx(city)
-                if coords:
-                    list_element = [freq for match, freq
-                                    in value.iteritems() if match == word
-                                    ]
-                    if list_element:
-                        # self.geo_map.set_position(coords, value[word])
-                        coords_list.append(coords)
-                        matched_freqs.append(list_element[0])
-                    else:
-                        ncoords_list.append(coords)
-            # If matched frequencies not empty
-            if matched_freqs:
-                # if word == "targi":
-                #     surf(self.geo_map.country_map)
-                c_mass = np.sum([(coord[0] * freq, coord[1] * freq)
-                                 for coord, freq in zip(coords_list, matched_freqs)],
-                                axis=0)
-                c_mass /= np.sum(matched_freqs, axis=0)
-                start = [0.1, 0.1]
-                end = [2.0, 2.0]
-                if len(coords_list) > 5:
-                    print word
-                    print c_mass
-                    print coords_list
-                    word_params = self.find_parameters(start, end, c_mass,
-                                                       coords_list, ncoords_list, 0.1)
-                    param_file.write(str(word_params))
+            word_params = self.word_prediction_params(word, citi_dict)
+            if word_params:
+                print word
+                print word_params
+                param_file.write(str(word_params))
         param_file.close()
 
-
+    def word_prediction_params(self, word, citi_dict):
+        matched_freqs = []
+        coords_list = []
+        ncoords_list = []
+        self.geo_map.clean()
+        for city, value in citi_dict.iteritems():
+            coords = self.geo_map.citi2idx(city)
+            if coords:
+                list_element = [freq for match, freq
+                                in value.iteritems() if match == word
+                                ]
+                if list_element:
+                    # self.geo_map.set_position(coords, value[word])
+                    coords_list.append(coords)
+                    matched_freqs.append(list_element[0])
+                else:
+                    ncoords_list.append(coords)
+        # If matched frequencies not empty
+        if matched_freqs:
+            # if word == "targi":
+            #     surf(self.geo_map.country_map)
+            c_mass = np.sum([(coord[0] * freq, coord[1] * freq)
+                             for coord, freq in zip(coords_list, matched_freqs)],
+                            axis=0)
+            c_mass /= np.sum(matched_freqs, axis=0)
+            start = [0.1, 0.1]
+            end = [2.0, 2.0]
+            if len(coords_list) > 5:
+                word_params = self.find_parameters(start, end, c_mass,
+                                                   coords_list, ncoords_list, 0.1)
+                return word_params
+            return None
 
 def main():
     ct = CityStats(db_addr=settings["db_addr"], punfile=settings["punfile_name"]
