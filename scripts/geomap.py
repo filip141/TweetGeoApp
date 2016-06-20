@@ -29,6 +29,16 @@ class GeoMap(object):
         idx = (int(latt_km / self.precision), int(long_km / self.precision))
         return idx
 
+    def idx2cords(self, idx):
+        (latt_km, long_km) = (idx[0] * self.precision, idx[1] * self.precision)
+        norm_lati = latt_km / GeoMap.dlat
+        latitude = norm_lati + self.dlatitude
+        angle = (latitude + self.dlatitude) / 2
+        dlong = abs(111.320 * np.cos(np.pi * angle / 180))
+        norm_long = long_km / dlong
+        longitude = norm_long + self.llongitude
+        return latitude, longitude
+
     # Convert city name to array coords
     def citi2idx(self, city):
         coords_dict = self.citi_coords

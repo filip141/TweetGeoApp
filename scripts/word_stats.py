@@ -55,7 +55,6 @@ class WordTokenizer(object):
         return self.tokens_re.findall(word)
 
     def preprocess(self, s, lowercase=False, words_only=False):
-        s = s.lower()
         tokens = self.tokenize(s)
         if words_only:
             tokens = [token
@@ -90,7 +89,7 @@ class WordStats(object):
         stop = self.stop + self.punctation + ["rt"]
         for djson in json_base:
             json_text = djson.get("text")
-            str_words = self.tokenizer.preprocess(json_text, lowercase=True,
+            str_words = self.tokenizer.preprocess(json_text, lowercase=False,
                                                   words_only=True)
             str_words = [term for term in str_words if term not in stop]
             an_words = []
@@ -101,7 +100,7 @@ class WordStats(object):
 
     def divide_tweet(self, text):
         stop = self.stop + self.punctation + ["rt"]
-        str_words = self.tokenizer.preprocess(text, lowercase=True,
+        str_words = self.tokenizer.preprocess(text, lowercase=False,
                                               words_only=True)
         str_words = [term for term in str_words if term not in stop]
         an_words = []
@@ -228,7 +227,8 @@ class CityStats(object):
             if word_params:
                 print word
                 print word_params
-                param_file.write(str(word_params))
+                param_file.write(str(word_params[0]) + ';' +
+                                 str(word_params[1].tolist()))
         param_file.close()
 
     def word_prediction_params(self, word, citi_dict):
@@ -261,7 +261,7 @@ class CityStats(object):
             if len(coords_list) > 5:
                 word_params = self.find_parameters(start, end, c_mass,
                                                    coords_list, ncoords_list, 0.1)
-                return word_params
+                return word_params, c_mass
             return None
 
 def main():
